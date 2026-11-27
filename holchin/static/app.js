@@ -1046,7 +1046,7 @@ function sectionSummary(sec, a) {
   if (sec === 'General') return esc([a.language, a.maturity].filter(Boolean).join(' · '));
   if (sec === 'Existing baseline') return a.existing_sloc ? fmtCompact(+a.existing_sloc) + ' SLOC' : '';
   if (sec === 'New development') return tri('new_sloc') ? fmtCompact(tri('new_sloc')) + ' SLOC' : tri('new_requirements') ? fmtN(tri('new_requirements')) + ' reqs' : '';
-  if (sec === 'Modification of existing') return tri('pct_code_modified') ? `CM ${tri('pct_code_modified')}%` : '';
+  if (sec === 'Modification of existing') return tri('percent_code_modified') ? `CM ${tri('percent_code_modified')}%` : '';
   return '';
 }
 function refreshSummary(ed, sec, attrs) {

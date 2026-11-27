@@ -77,9 +77,9 @@ class ModelTests(unittest.TestCase):
 
     def test_esloc_and_effort(self):
         attrs = self.comp(new_sloc={"low": 10000, "likely": 10000, "high": 10000}, existing_sloc=10000,
-                          pct_design_modified={"low": 50, "likely": 50, "high": 50},
-                          pct_code_modified={"low": 50, "likely": 50, "high": 50},
-                          pct_integration={"low": 50, "likely": 50, "high": 50},
+                          percent_design_modified={"low": 50, "likely": 50, "high": 50},
+                          percent_code_modified={"low": 50, "likely": 50, "high": 50},
+                          percent_integration={"low": 50, "likely": 50, "high": 50},
                           maturity="Delivered", language="C")["attributes"]
         r = model.ComponentModel(attrs, self.s).point("likely")
         self.assertAlmostEqual(r["adapted_esloc"], 5000)
@@ -124,6 +124,13 @@ class ModelTests(unittest.TestCase):
         self.assertIn("new_sloc", a)
         self.assertEqual(p["tree"][1]["type"], "group")
         self.assertTrue(p["tree"][1]["children"][0]["id"])
+
+    def test_legacy_pct_keys_migrated(self):
+        p = model.normalise_project({"tree": [{"name": "x", "attributes": {
+            "pct_code_modified": {"low": 5, "likely": 10, "high": 20}}}]})
+        a = p["tree"][0]["attributes"]
+        self.assertNotIn("pct_code_modified", a)
+        self.assertEqual(a["percent_code_modified"], {"low": 5, "likely": 10, "high": 20})
 
     def test_custom_multiplier_in_settings(self):
         s = {"multipliers": {"security": {"label": "Security", "default": "High",

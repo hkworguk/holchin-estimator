@@ -95,7 +95,7 @@ tree:
           maturity: SRR
           size_basis: sloc
           existing_sloc: 85000
-          pct_code_modified: {low: 15, likely: 25, high: 45}
+          percent_code_modified: {low: 15, likely: 25, high: 45}
           new_sloc: {low: 12000, likely: 18000, high: 30000}
           mult_complexity: High
           safety_level: DAL-B     # custom attributes round-trip untouched

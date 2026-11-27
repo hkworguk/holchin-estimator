@@ -118,11 +118,11 @@ tree:
               existing_sloc: 85000
               existing_requirements: 420
               existing_use_cases: 0
-              pct_design_modified: {low: 10, likely: 20, high: 35}
-              pct_code_modified: {low: 15, likely: 25, high: 45}
-              pct_integration: {low: 40, likely: 60, high: 90}
-              pct_requirements_modified: {low: 10, likely: 20, high: 30}
-              pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+              percent_design_modified: {low: 10, likely: 20, high: 35}
+              percent_code_modified: {low: 15, likely: 25, high: 45}
+              percent_integration: {low: 40, likely: 60, high: 90}
+              percent_requirements_modified: {low: 10, likely: 20, high: 30}
+              percent_use_cases_modified: {low: 0, likely: 0, high: 0}
               new_sloc: {low: 12000, likely: 18000, high: 30000}
               new_requirements: {low: 80, likely: 120, high: 180}
               new_use_cases: {low: 0, likely: 0, high: 0}
@@ -146,11 +146,11 @@ tree:
               existing_sloc: 0
               existing_requirements: 0
               existing_use_cases: 0
-              pct_design_modified: {low: 0, likely: 0, high: 0}
-              pct_code_modified: {low: 0, likely: 0, high: 0}
-              pct_integration: {low: 0, likely: 0, high: 0}
-              pct_requirements_modified: {low: 0, likely: 0, high: 0}
-              pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+              percent_design_modified: {low: 0, likely: 0, high: 0}
+              percent_code_modified: {low: 0, likely: 0, high: 0}
+              percent_integration: {low: 0, likely: 0, high: 0}
+              percent_requirements_modified: {low: 0, likely: 0, high: 0}
+              percent_use_cases_modified: {low: 0, likely: 0, high: 0}
               new_sloc: {low: 8000, likely: 12000, high: 20000}
               new_requirements: {low: 40, likely: 60, high: 90}
               new_use_cases: {low: 10, likely: 14, high: 22}
@@ -174,11 +174,11 @@ tree:
           existing_sloc: 120000
           existing_requirements: 0
           existing_use_cases: 0
-          pct_design_modified: {low: 2, likely: 5, high: 10}
-          pct_code_modified: {low: 5, likely: 8, high: 15}
-          pct_integration: {low: 20, likely: 30, high: 50}
-          pct_requirements_modified: {low: 0, likely: 0, high: 0}
-          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          percent_design_modified: {low: 2, likely: 5, high: 10}
+          percent_code_modified: {low: 5, likely: 8, high: 15}
+          percent_integration: {low: 20, likely: 30, high: 50}
+          percent_requirements_modified: {low: 0, likely: 0, high: 0}
+          percent_use_cases_modified: {low: 0, likely: 0, high: 0}
           new_sloc: {low: 6000, likely: 9000, high: 14000}
           new_requirements: {low: 0, likely: 0, high: 0}
           new_use_cases: {low: 0, likely: 0, high: 0}
@@ -202,11 +202,11 @@ tree:
           existing_sloc: 0
           existing_requirements: 0
           existing_use_cases: 0
-          pct_design_modified: {low: 0, likely: 0, high: 0}
-          pct_code_modified: {low: 0, likely: 0, high: 0}
-          pct_integration: {low: 0, likely: 0, high: 0}
-          pct_requirements_modified: {low: 0, likely: 0, high: 0}
-          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          percent_design_modified: {low: 0, likely: 0, high: 0}
+          percent_code_modified: {low: 0, likely: 0, high: 0}
+          percent_integration: {low: 0, likely: 0, high: 0}
+          percent_requirements_modified: {low: 0, likely: 0, high: 0}
+          percent_use_cases_modified: {low: 0, likely: 0, high: 0}
           new_sloc: {low: 0, likely: 0, high: 0}
           new_requirements: {low: 60, likely: 90, high: 150}
           new_use_cases: {low: 0, likely: 0, high: 0}
@@ -235,11 +235,11 @@ tree:
           existing_sloc: 0
           existing_requirements: 0
           existing_use_cases: 0
-          pct_design_modified: {low: 0, likely: 0, high: 0}
-          pct_code_modified: {low: 0, likely: 0, high: 0}
-          pct_integration: {low: 0, likely: 0, high: 0}
-          pct_requirements_modified: {low: 0, likely: 0, high: 0}
-          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          percent_design_modified: {low: 0, likely: 0, high: 0}
+          percent_code_modified: {low: 0, likely: 0, high: 0}
+          percent_integration: {low: 0, likely: 0, high: 0}
+          percent_requirements_modified: {low: 0, likely: 0, high: 0}
+          percent_use_cases_modified: {low: 0, likely: 0, high: 0}
           new_sloc: {low: 15000, likely: 22000, high: 35000}
           new_requirements: {low: 0, likely: 0, high: 0}
           new_use_cases: {low: 0, likely: 0, high: 0}
@@ -263,11 +263,11 @@ tree:
           existing_sloc: 10000
           existing_requirements: 0
           existing_use_cases: 0
-          pct_design_modified: {low: 10, likely: 30, high: 50}
-          pct_code_modified: {low: 20, likely: 40, high: 60}
-          pct_integration: {low: 50, likely: 80, high: 100}
-          pct_requirements_modified: {low: 0, likely: 0, high: 0}
-          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          percent_design_modified: {low: 10, likely: 30, high: 50}
+          percent_code_modified: {low: 20, likely: 40, high: 60}
+          percent_integration: {low: 50, likely: 80, high: 100}
+          percent_requirements_modified: {low: 0, likely: 0, high: 0}
+          percent_use_cases_modified: {low: 0, likely: 0, high: 0}
           new_sloc: {low: 4000, likely: 7000, high: 14000}
           new_requirements: {low: 0, likely: 0, high: 0}
           new_use_cases: {low: 0, likely: 0, high: 0}
@@ -291,11 +291,11 @@ tree:
           existing_sloc: 0
           existing_requirements: 0
           existing_use_cases: 0
-          pct_design_modified: {low: 0, likely: 0, high: 0}
-          pct_code_modified: {low: 0, likely: 0, high: 0}
-          pct_integration: {low: 0, likely: 0, high: 0}
-          pct_requirements_modified: {low: 0, likely: 0, high: 0}
-          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          percent_design_modified: {low: 0, likely: 0, high: 0}
+          percent_code_modified: {low: 0, likely: 0, high: 0}
+          percent_integration: {low: 0, likely: 0, high: 0}
+          percent_requirements_modified: {low: 0, likely: 0, high: 0}
+          percent_use_cases_modified: {low: 0, likely: 0, high: 0}
           new_sloc: {low: 3000, likely: 5000, high: 9000}
           new_requirements: {low: 0, likely: 0, high: 0}
           new_use_cases: {low: 0, likely: 0, high: 0}

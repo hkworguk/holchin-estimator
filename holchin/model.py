@@ -140,18 +140,18 @@ BASE_PARAMETERS = [
      "section": "Existing baseline", "default": 0, "min": 0},
 
     # -- Modification of existing
-    {"key": "pct_design_modified", "label": "Design modified (DM)", "type": "tri_percent",
+    {"key": "percent_design_modified", "label": "Design modified (DM)", "type": "tri_percent",
      "section": "Modification of existing", "default": {"low": 0, "likely": 0, "high": 0},
      "help": "% of the existing design that must change."},
-    {"key": "pct_code_modified", "label": "Code modified (CM)", "type": "tri_percent",
+    {"key": "percent_code_modified", "label": "Code modified (CM)", "type": "tri_percent",
      "section": "Modification of existing", "default": {"low": 0, "likely": 0, "high": 0},
      "help": "% of the existing code that must change."},
-    {"key": "pct_integration", "label": "Integration & test (IM)", "type": "tri_percent",
+    {"key": "percent_integration", "label": "Integration & test (IM)", "type": "tri_percent",
      "section": "Modification of existing", "default": {"low": 0, "likely": 0, "high": 0},
      "help": "% of the integration and test effort of new code needed to integrate the existing code."},
-    {"key": "pct_requirements_modified", "label": "Requirements modified", "type": "tri_percent",
+    {"key": "percent_requirements_modified", "label": "Requirements modified", "type": "tri_percent",
      "section": "Modification of existing", "default": {"low": 0, "likely": 0, "high": 0}},
-    {"key": "pct_use_cases_modified", "label": "Use cases modified", "type": "tri_percent",
+    {"key": "percent_use_cases_modified", "label": "Use cases modified", "type": "tri_percent",
      "section": "Modification of existing", "default": {"low": 0, "likely": 0, "high": 0}},
 
     # -- New development
@@ -234,6 +234,17 @@ def new_project(name="New estimate") -> dict:
     }
 
 
+# Attribute keys renamed in later versions: old key -> new key. Applied on load so
+# older project files keep working; the file is written with the new keys on save.
+RENAMED_ATTRIBUTES = {
+    "pct_design_modified": "percent_design_modified",
+    "pct_code_modified": "percent_code_modified",
+    "pct_integration": "percent_integration",
+    "pct_requirements_modified": "percent_requirements_modified",
+    "pct_use_cases_modified": "percent_use_cases_modified",
+}
+
+
 def normalise_project(data: dict) -> dict:
     """Make a loaded project structurally valid (ids, types, attribute defaults)."""
     if not isinstance(data, dict):
@@ -266,6 +277,10 @@ def normalise_project(data: dict) -> dict:
                 n.pop("attributes", None)
             else:
                 attrs = n.get("attributes") or {}
+                for old, new in RENAMED_ATTRIBUTES.items():
+                    if old in attrs:
+                        val = attrs.pop(old)
+                        attrs.setdefault(new, val)
                 for k, v in defaults.items():
                     attrs.setdefault(k, copy.deepcopy(v))
                 n["attributes"] = attrs
@@ -337,9 +352,9 @@ def percentile(sorted_vals, p):
 class ComponentModel:
     """Evaluates one component for a given choice of input values."""
 
-    TRI_KEYS = ["new_sloc", "new_requirements", "new_use_cases", "pct_design_modified",
-                "pct_code_modified", "pct_integration", "pct_requirements_modified",
-                "pct_use_cases_modified"]
+    TRI_KEYS = ["new_sloc", "new_requirements", "new_use_cases", "percent_design_modified",
+                "percent_code_modified", "percent_integration", "percent_requirements_modified",
+                "percent_use_cases_modified"]
 
     def __init__(self, attrs: dict, settings: dict):
         self.s = settings
@@ -381,18 +396,18 @@ class ComponentModel:
     def evaluate(self, v: dict) -> dict:
         """v maps TRI_KEYS (+ growth) to scalar values."""
         dm, cm, im = (max(0.0, min(100.0, v[k])) / 100.0 for k in
-                      ("pct_design_modified", "pct_code_modified", "pct_integration"))
+                      ("percent_design_modified", "percent_code_modified", "percent_integration"))
         aaf = self.w[0] * dm + self.w[1] * cm + self.w[2] * im
         bases = {}
         new_s, adapt_s = max(0.0, v["new_sloc"]), self.existing_sloc * aaf
         if new_s or adapt_s:
             bases["sloc"] = (new_s, adapt_s)
         rq_new = max(0.0, v["new_requirements"]) * self.sloc_per_req
-        rq_ad = self.existing_req * max(0.0, v["pct_requirements_modified"]) / 100.0 * self.sloc_per_req
+        rq_ad = self.existing_req * max(0.0, v["percent_requirements_modified"]) / 100.0 * self.sloc_per_req
         if rq_new or rq_ad:
             bases["requirements"] = (rq_new, rq_ad)
         uc_new = max(0.0, v["new_use_cases"]) * self.sloc_per_uc
-        uc_ad = self.existing_uc * max(0.0, v["pct_use_cases_modified"]) / 100.0 * self.sloc_per_uc
+        uc_ad = self.existing_uc * max(0.0, v["percent_use_cases_modified"]) / 100.0 * self.sloc_per_uc
         if uc_new or uc_ad:
             bases["use_cases"] = (uc_new, uc_ad)
 
