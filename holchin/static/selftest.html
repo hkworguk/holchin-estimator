@@ -6,7 +6,8 @@
 <div id="tooltip" class="tooltip"></div><div id="menu" class="menu"></div><div id="modal" class="modal-backdrop" hidden><div class="modal"></div></div><div id="toast" class="toast"></div>
 <pre id="out" style="position:fixed;inset:0;background:#fff;color:#000;z-index:999;margin:0;padding:20px;font:14px monospace;white-space:pre-wrap"></pre>
 <script>
-const LOG = []; window.onerror = (m, s, l) => LOG.push('ERROR ' + m + ' @' + l);
+const LOG = [];
+window.onerror = (m, s, l) => LOG.push('ERROR ' + m + ' @' + l);
 window.addEventListener('unhandledrejection', (e) => LOG.push('REJECT ' + (e.reason && e.reason.stack || e.reason)));
 window.confirm = () => true;
 </script>
@@ -14,82 +15,144 @@ window.confirm = () => true;
 <script>
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const ok = (c, m) => LOG.push((c ? 'PASS ' : 'FAIL ') + m);
-async function settle() { await wait(50); for (let i = 0; i < 100 && (S.busy || estTimer && !S.results); i++) await wait(50); await wait(400); }
-(async () => {
-  try {
-    await wait(1500); await settle();
-    ok(Object.keys(S.results).length === 11, 'results for all nodes: ' + Object.keys(S.results).length);
-    const byName = (n) => { let f; S.idx.forEach((v) => { if (v.node.name === n) f = v.node; }); return f; };
-    const ui = byName('Planning UI'), fw = byName('Flight Software'), planner = byName('Planner core');
-    // add group
-    select(fw.id); addNode('group'); await wait(50);
-    document.activeElement.value = 'Avionics'; document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
-    const av = byName('Avionics'); ok(av && parentOf(av.id).id === fw.id, 'add + rename group inside Flight Software');
-    // move
-    moveNodes([ui.id], av.id, 'inside'); ok(parentOf(ui.id).id === av.id, 'move component into new group');
-    moveNodes([av.id], ui.id, 'inside'); ok(parentOf(av.id).id === fw.id, 'refuse moving group into its own child');
-    moveNodes([ui.id], planner.id, 'before'); ok(parentOf(ui.id).id === parentOf(planner.id).id && parentOf(planner.id).children.indexOf(ui) === parentOf(planner.id).children.indexOf(planner) - 1, 'move before sibling');
-    // multi-select move
-    S.sel = new Set([ui.id, planner.id]); moveNodes([...S.sel], av.id, 'inside');
-    ok(parentOf(ui.id).id === av.id && parentOf(planner.id).id === av.id, 'multi-select move');
-    await settle();
-    ok(Math.abs(S.results[av.id].mc.effort_pm.stats.mean - S.results[ui.id].mc.effort_pm.stats.mean - S.results[planner.id].mc.effort_pm.stats.mean) < 1e-6, 'group rolls up moved components');
-    // edit a tri field
-    select(planner.id); await wait(50);
-    const f = document.querySelector('.field[data-key="new_sloc"]');
-    const before = S.results[planner.id].points.likely.esloc;
-    const lk = f.querySelector('input[data-k="likely"]'); lk.value = 25000; lk.dispatchEvent(new Event('input'));
-    ok(planner.attributes.new_sloc.likely === 25000, 'tri input updates attribute');
-    await settle();
-    ok(S.results[planner.id].points.likely.esloc > before, 'estimate recomputed after edit');
-    f.querySelector('[data-spread]').click(); ok(planner.attributes.new_sloc.low === 20000 && planner.attributes.new_sloc.high === 37500, 'spread button');
-    // select field
-    const sel = document.querySelector('.field[data-key="mult_complexity"] select'); sel.value = 'Very Low'; sel.dispatchEvent(new Event('change'));
-    ok(planner.attributes.mult_complexity === 'Very Low', 'multiplier select');
-    // custom attribute
-    document.querySelector('#newCKey').value = 'safety_level'; document.querySelector('#newCVal').value = 'DAL-B';
-    document.querySelector('#addCustom').click(); ok(planner.attributes.safety_level === 'DAL-B', 'add custom attribute');
-    // undo / redo
-    const n = S.undo.length; undo(); await wait(200); ok(!('safety_level' in getNode(planner.id).attributes), 'undo custom attribute');
-    redo(); await wait(200); ok(getNode(planner.id).attributes.safety_level === 'DAL-B', 'redo');
-    // metric switch & charts
-    for (const m of ['cost', 'schedule_months', 'esloc', 'effort_pm']) { document.querySelector(`[data-metric="${m}"]`).click(); }
-    ok(document.querySelectorAll('.chart svg').length >= 6, 'charts drawn: ' + document.querySelectorAll('.chart svg').length);
-    // duplicate, wrap, delete
-    duplicate([planner.id]); const copy = byName('Planner core (copy)'); ok(!!copy && copy.id !== planner.id, 'duplicate');
-    S.sel = new Set([copy.id]); S.primary = copy.id; wrapInGroup([copy.id]); await wait(50);
-    document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
-    ok(parentOf(copy.id).type === 'group' && parentOf(copy.id).name === 'New group', 'wrap in group');
-    const g = parentOf(copy.id); removeNodes([g.id]); ok(!S.idx.has(g.id) && !S.idx.has(copy.id), 'delete group with child');
-    // context menu
-    select(fw.id); showNodeMenu(100, 100); ok(document.querySelectorAll('#menu button').length > 5, 'context menu'); hideMenu();
-    // settings dialog: rename a language and maturity, add a driver
-    select(planner.id); settingsDialog(); await wait(100);
-    const m = document.querySelector('.modal');
-    m.querySelector('[data-tab="languages"]').click(); await wait(50);
-    const java = [...m.querySelectorAll('tr[data-i] input[data-f="name"]')].find((i) => i.value === 'Java');
-    java.value = 'Java 21'; java.dispatchEvent(new Event('input'));
-    m.querySelector('[data-tab="mults"]').click(); await wait(50);
-    m.querySelector('#addRow').click(); await wait(50);
-    m.querySelector('[data-tab="maturity"]').click(); await wait(50);
-    m.querySelector('[data-tab="yaml"]').click(); await wait(500);
-    ok(m.querySelector('#yamlBox').value.includes('Java 21'), 'settings YAML view reflects edits');
-    m.querySelector('[data-tab="general"]').click(); await wait(50);
-    m.querySelector('#applySettings').click(); await wait(400); await settle();
-    ok(getNode(planner.id).attributes.language === 'Java 21', 'language rename migrates components');
-    ok(S.schema.some((p) => p.key === 'mult_driver_6'), 'new effort driver in schema');
-    ok(getNode(planner.id).attributes.mult_driver_6 === 'Nominal', 'new driver default applied');
-    // YAML round trip through server
-    const y = await api('/api/dump', S.project, { text: true });
-    const back = (await api('/api/parse', y, { raw: true })).project;
-    ok(JSON.stringify(back.tree) === JSON.stringify(S.project.tree), 'YAML round-trip of edited project');
-    // filter
-    S.filter = 'guid'; renderTree(); ok(document.querySelectorAll('#tree .row').length === 3, 'tree filter'); S.filter = ''; renderTree();
-    // collapse
-    setAllExpanded(false); ok(document.querySelectorAll('#tree .row').length === 3, 'collapse all'); setAllExpanded(true);
-  } catch (e) { LOG.push('EXCEPTION ' + e.stack); }
-  const fails = LOG.filter((l) => !l.startsWith('PASS')).length;
-  document.getElementById('out').textContent = (fails ? fails + ' PROBLEMS\n\n' : 'ALL PASSED\n\n') + LOG.join('\n');
-})();
+async function settle() { await wait(50); for (let i = 0; i < 100 && (S.busy || estTimer && !S.results); i++)
+      await wait(50);
+    await wait(400); }
+  (async () => {
+    try {
+      await wait(1500);
+      await settle();
+      ok(Object.keys(S.results).length === S.idx.size, 'results for all nodes: ' + Object.keys(S.results).length);
+      const byName = (n) => { let f;
+        S.idx.forEach((v) => { if (v.node.name === n) f = v.node; }); return f; };
+      // Pick test nodes by tree position, not name, so editing examples/sample.yaml doesn't break the test.
+      // Needs: first top-level group contains a sub-group with >= 2 components; at least 2 top-level groups.
+      const topGroups = S.project.tree.filter((n) => n.type === 'group');
+      const sub = topGroups[0].children.find((n) => n.type === 'group');
+      const [planner, ui] = sub.children.filter((n) => n.type === 'component');
+      const fw = topGroups[topGroups.length - 1];
+      // add group
+      select(fw.id);
+      addNode('group');
+      await wait(50);
+      document.activeElement.value = 'Avionics';
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      const av = byName('Avionics');
+      ok(av && parentOf(av.id).id === fw.id, 'add + rename group inside last top-level group');
+      // move
+      moveNodes([ui.id], av.id, 'inside');
+      ok(parentOf(ui.id).id === av.id, 'move component into new group');
+      moveNodes([av.id], ui.id, 'inside');
+      ok(parentOf(av.id).id === fw.id, 'refuse moving group into its own child');
+      moveNodes([ui.id], planner.id, 'before');
+      ok(parentOf(ui.id).id === parentOf(planner.id).id && parentOf(planner.id).children.indexOf(ui) === parentOf(
+        planner.id).children.indexOf(planner) - 1, 'move before sibling');
+      // multi-select move
+      S.sel = new Set([ui.id, planner.id]);
+      moveNodes([...S.sel], av.id, 'inside');
+      ok(parentOf(ui.id).id === av.id && parentOf(planner.id).id === av.id, 'multi-select move');
+      await settle();
+      ok(Math.abs(S.results[av.id].mc.effort_pm.stats.mean - S.results[ui.id].mc.effort_pm.stats.mean - S.results[
+        planner.id].mc.effort_pm.stats.mean) < 1e-6, 'group rolls up moved components');
+      // edit a tri field
+      select(planner.id);
+      await wait(50);
+      const f = document.querySelector('.field[data-key="new_sloc"]');
+      const before = S.results[planner.id].points.likely.esloc;
+      const lk = f.querySelector('input[data-k="likely"]');
+      lk.value = 25000;
+      lk.dispatchEvent(new Event('input'));
+      ok(planner.attributes.new_sloc.likely === 25000, 'tri input updates attribute');
+      await settle();
+      ok(S.results[planner.id].points.likely.esloc > before, 'estimate recomputed after edit');
+      f.querySelector('[data-spread]').click();
+      ok(planner.attributes.new_sloc.low === 20000 && planner.attributes.new_sloc.high === 37500, 'spread button');
+      // select field
+      const sel = document.querySelector('.field[data-key="mult_complexity"] select');
+      sel.value = 'Very Low';
+      sel.dispatchEvent(new Event('change'));
+      ok(planner.attributes.mult_complexity === 'Very Low', 'multiplier select');
+      // custom attribute
+      document.querySelector('#newCKey').value = 'safety_level';
+      document.querySelector('#newCVal').value = 'DAL-B';
+      document.querySelector('#addCustom').click();
+      ok(planner.attributes.safety_level === 'DAL-B', 'add custom attribute');
+      // undo / redo
+      const n = S.undo.length;
+      undo();
+      await wait(200);
+      ok(!('safety_level' in getNode(planner.id).attributes), 'undo custom attribute');
+      redo();
+      await wait(200);
+      ok(getNode(planner.id).attributes.safety_level === 'DAL-B', 'redo');
+      // metric switch & charts
+      for (const m of ['cost', 'schedule_months', 'esloc', 'effort_pm']) { document.querySelector(
+          `[data-metric="${m}"]`).click(); }
+      ok(document.querySelectorAll('.chart svg').length >= 6, 'charts drawn: ' + document.querySelectorAll(
+        '.chart svg').length);
+      // duplicate, wrap, delete
+      duplicate([planner.id]);
+      const copy = byName(planner.name + ' (copy)');
+      ok(!!copy && copy.id !== planner.id, 'duplicate');
+      S.sel = new Set([copy.id]);
+      S.primary = copy.id;
+      wrapInGroup([copy.id]);
+      await wait(50);
+      document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+      ok(parentOf(copy.id).type === 'group' && parentOf(copy.id).name === 'New group', 'wrap in group');
+      const g = parentOf(copy.id);
+      removeNodes([g.id]);
+      ok(!S.idx.has(g.id) && !S.idx.has(copy.id), 'delete group with child');
+      // context menu
+      select(fw.id);
+      showNodeMenu(100, 100);
+      ok(document.querySelectorAll('#menu button').length > 5, 'context menu');
+      hideMenu();
+      // settings dialog: rename a language and maturity, add a driver
+      select(planner.id);
+      settingsDialog();
+      await wait(100);
+      const m = document.querySelector('.modal');
+      m.querySelector('[data-tab="languages"]').click();
+      await wait(50);
+      const java = [...m.querySelectorAll('tr[data-i] input[data-f="name"]')].find((i) => i.value === 'Java');
+      java.value = 'Java 21';
+      java.dispatchEvent(new Event('input'));
+      m.querySelector('[data-tab="mults"]').click();
+      await wait(50);
+      m.querySelector('#addRow').click();
+      await wait(50);
+      m.querySelector('[data-tab="maturity"]').click();
+      await wait(50);
+      m.querySelector('[data-tab="yaml"]').click();
+      await wait(500);
+      ok(m.querySelector('#yamlBox').value.includes('Java 21'), 'settings YAML view reflects edits');
+      m.querySelector('[data-tab="general"]').click();
+      await wait(50);
+      m.querySelector('#applySettings').click();
+      await wait(400);
+      await settle();
+      ok(getNode(planner.id).attributes.language === 'Java 21', 'language rename migrates components');
+      ok(S.schema.some((p) => p.key === 'mult_driver_6'), 'new effort driver in schema');
+      ok(getNode(planner.id).attributes.mult_driver_6 === 'Nominal', 'new driver default applied');
+      // YAML round trip through server
+      const y = await api('/api/dump', S.project, { text: true });
+      const back = (await api('/api/parse', y, { raw: true })).project;
+      ok(JSON.stringify(back.tree) === JSON.stringify(S.project.tree), 'YAML round-trip of edited project');
+      // filter
+      S.filter = 'avionics'; // the group created above: expect root > last top-level group > Avionics
+      renderTree();
+      ok(document.querySelectorAll('#tree .row').length === 3, 'tree filter');
+      S.filter = '';
+      renderTree();
+      // collapse
+      setAllExpanded(false);
+      ok(document.querySelectorAll('#tree .row').length === 1 + S.project.tree.length, 'collapse all');
+      setAllExpanded(true);
+    } catch (e) { LOG.push('EXCEPTION ' + e.stack); }
+    const fails = LOG.filter((l) => !l.startsWith('PASS')).length;
+    document.getElementById('out').textContent = (fails ? fails + ' PROBLEMS\n\n' : 'ALL PASSED\n\n') + LOG.join(
+      '\n');
+  })();
 </script>
 </body></html>
