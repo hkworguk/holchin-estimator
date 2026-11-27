@@ -1,0 +1,2 @@
+# Holchin Estimator uses only the Python standard library (Python 3.9+).
+# Add any future dependencies below; activate.sh installs this file into .venv.

@@ -1,0 +1,309 @@
+# Holchin software estimation model
+# tree: groups (type: group, children) and components (type: component, attributes).
+# Three-point values are {low, likely, high}. 'settings' overrides model defaults.
+project:
+  name: Satelite Upgrade
+  description: Example estimate for the Holchin estimator.
+  version: 1
+settings:
+  currency: "£"
+  labour_rate_per_hour: 120
+  hours_per_pm: 152
+  effort: {A: 2.94, B: 1.1}
+  schedule: {C: 3.67, D: 0.318}
+  adaptation_weights: {design: 0.4, code: 0.3, integration: 0.3}
+  sizing: {sloc_per_requirement: 120, sloc_per_use_case: 900}
+  monte_carlo: {iterations: 3000, seed: 1234, correlation: 0.3}
+  maturity:
+    - name: Concept / Proposal
+      growth_new: {low: 20, likely: 55, high: 100}
+      growth_reused: {low: 10, likely: 30, high: 60}
+    - name: SRR
+      growth_new: {low: 15, likely: 40, high: 80}
+      growth_reused: {low: 8, likely: 25, high: 50}
+    - name: SDR / SFR
+      growth_new: {low: 10, likely: 30, high: 60}
+      growth_reused: {low: 5, likely: 18, high: 40}
+    - name: PDR
+      growth_new: {low: 5, likely: 20, high: 45}
+      growth_reused: {low: 3, likely: 12, high: 30}
+    - name: CDR
+      growth_new: {low: 3, likely: 12, high: 30}
+      growth_reused: {low: 2, likely: 8, high: 20}
+    - name: TRR / Code complete
+      growth_new: {low: 0, likely: 5, high: 15}
+      growth_reused: {low: 0, likely: 3, high: 10}
+    - name: Delivered
+      growth_new: {low: 0, likely: 0, high: 0}
+      growth_reused: {low: 0, likely: 0, high: 0}
+  languages:
+    - {name: C, effort_factor: 1}
+    - {name: C++, effort_factor: 1}
+    - {name: "C#", effort_factor: 0.95}
+    - {name: Java, effort_factor: 0.95}
+    - {name: Python, effort_factor: 0.9}
+    - {name: JavaScript / TypeScript, effort_factor: 0.95}
+    - {name: Ada, effort_factor: 1.05}
+    - {name: Rust, effort_factor: 1}
+    - {name: Go, effort_factor: 0.92}
+    - {name: Fortran, effort_factor: 1.05}
+    - {name: SQL, effort_factor: 0.85}
+    - {name: VHDL / Verilog, effort_factor: 1.2}
+    - {name: Assembly, effort_factor: 1.4}
+    - {name: Other, effort_factor: 1}
+  multipliers:
+    complexity:
+      label: Product complexity
+      default: Nominal
+      options:
+        Very Low: 0.73
+        Low: 0.87
+        Nominal: 1
+        High: 1.17
+        Very High: 1.34
+        Extra High: 1.74
+    reliability:
+      label: Required reliability
+      default: Nominal
+      options:
+        Very Low: 0.82
+        Low: 0.92
+        Nominal: 1
+        High: 1.1
+        Very High: 1.26
+    team_capability:
+      label: Team capability
+      default: Nominal
+      options:
+        Very Low: 1.34
+        Low: 1.15
+        Nominal: 1
+        High: 0.88
+        Very High: 0.76
+    platform_volatility:
+      label: Platform volatility
+      default: Nominal
+      options: {Low: 0.87, Nominal: 1, High: 1.15, Very High: 1.3}
+    process_maturity:
+      label: Process maturity (CMMI)
+      default: Level 3
+      options:
+        Level 1: 1.2
+        Level 2: 1.08
+        Level 3: 1
+        Level 4: 0.93
+        Level 5: 0.87
+tree:
+  - id: 2f24b8f426
+    type: group
+    name: Ground Segment
+    expanded: true
+    children:
+      - id: 82e583ccb6
+        type: group
+        name: Mission Planning
+        expanded: true
+        children:
+          - id: e71f7538fb
+            type: component
+            name: Planner core
+            attributes:
+              description: |-
+                Re-host of legacy planner with new optimiser.
+                Keeps the existing scheduling kernel.
+              owner: ""
+              language: Java
+              maturity: SRR
+              size_basis: sloc
+              existing_sloc: 85000
+              existing_requirements: 420
+              existing_use_cases: 0
+              pct_design_modified: {low: 10, likely: 20, high: 35}
+              pct_code_modified: {low: 15, likely: 25, high: 45}
+              pct_integration: {low: 40, likely: 60, high: 90}
+              pct_requirements_modified: {low: 10, likely: 20, high: 30}
+              pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+              new_sloc: {low: 12000, likely: 18000, high: 30000}
+              new_requirements: {low: 80, likely: 120, high: 180}
+              new_use_cases: {low: 0, likely: 0, high: 0}
+              sloc_per_requirement: null
+              sloc_per_use_case: null
+              mult_complexity: High
+              mult_reliability: Nominal
+              mult_team_capability: Nominal
+              mult_platform_volatility: Nominal
+              mult_process_maturity: Level 3
+              extra_effort_factor: 1
+          - id: 83eed9247b
+            type: component
+            name: Planning UI
+            attributes:
+              description: ""
+              owner: ""
+              language: JavaScript / TypeScript
+              maturity: SRR
+              size_basis: sloc
+              existing_sloc: 0
+              existing_requirements: 0
+              existing_use_cases: 0
+              pct_design_modified: {low: 0, likely: 0, high: 0}
+              pct_code_modified: {low: 0, likely: 0, high: 0}
+              pct_integration: {low: 0, likely: 0, high: 0}
+              pct_requirements_modified: {low: 0, likely: 0, high: 0}
+              pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+              new_sloc: {low: 8000, likely: 12000, high: 20000}
+              new_requirements: {low: 40, likely: 60, high: 90}
+              new_use_cases: {low: 10, likely: 14, high: 22}
+              sloc_per_requirement: null
+              sloc_per_use_case: null
+              mult_complexity: Nominal
+              mult_reliability: Nominal
+              mult_team_capability: Nominal
+              mult_platform_volatility: Nominal
+              mult_process_maturity: Level 3
+              extra_effort_factor: 1
+      - id: 07179f1cd0
+        type: component
+        name: Telemetry processing
+        attributes:
+          description: ""
+          owner: ""
+          language: C++
+          maturity: PDR
+          size_basis: sloc
+          existing_sloc: 120000
+          existing_requirements: 0
+          existing_use_cases: 0
+          pct_design_modified: {low: 2, likely: 5, high: 10}
+          pct_code_modified: {low: 5, likely: 8, high: 15}
+          pct_integration: {low: 20, likely: 30, high: 50}
+          pct_requirements_modified: {low: 0, likely: 0, high: 0}
+          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          new_sloc: {low: 6000, likely: 9000, high: 14000}
+          new_requirements: {low: 0, likely: 0, high: 0}
+          new_use_cases: {low: 0, likely: 0, high: 0}
+          sloc_per_requirement: null
+          sloc_per_use_case: null
+          mult_complexity: Nominal
+          mult_reliability: High
+          mult_team_capability: Nominal
+          mult_platform_volatility: Nominal
+          mult_process_maturity: Level 3
+          extra_effort_factor: 1
+      - id: 65e54068fa
+        type: component
+        name: Archive & reporting
+        attributes:
+          description: ""
+          owner: ""
+          language: Python
+          maturity: SRR
+          size_basis: requirements
+          existing_sloc: 0
+          existing_requirements: 0
+          existing_use_cases: 0
+          pct_design_modified: {low: 0, likely: 0, high: 0}
+          pct_code_modified: {low: 0, likely: 0, high: 0}
+          pct_integration: {low: 0, likely: 0, high: 0}
+          pct_requirements_modified: {low: 0, likely: 0, high: 0}
+          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          new_sloc: {low: 0, likely: 0, high: 0}
+          new_requirements: {low: 60, likely: 90, high: 150}
+          new_use_cases: {low: 0, likely: 0, high: 0}
+          sloc_per_requirement: null
+          sloc_per_use_case: null
+          mult_complexity: Nominal
+          mult_reliability: Nominal
+          mult_team_capability: High
+          mult_platform_volatility: Nominal
+          mult_process_maturity: Level 3
+          extra_effort_factor: 1
+  - id: 3df67e4f2c
+    type: group
+    name: Space Segmant
+    expanded: true
+    children:
+      - id: 02ce890587
+        type: component
+        name: Guidance & control
+        attributes:
+          description: ""
+          owner: ""
+          language: C
+          maturity: SDR / SFR
+          size_basis: sloc
+          existing_sloc: 0
+          existing_requirements: 0
+          existing_use_cases: 0
+          pct_design_modified: {low: 0, likely: 0, high: 0}
+          pct_code_modified: {low: 0, likely: 0, high: 0}
+          pct_integration: {low: 0, likely: 0, high: 0}
+          pct_requirements_modified: {low: 0, likely: 0, high: 0}
+          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          new_sloc: {low: 15000, likely: 22000, high: 35000}
+          new_requirements: {low: 0, likely: 0, high: 0}
+          new_use_cases: {low: 0, likely: 0, high: 0}
+          sloc_per_requirement: null
+          sloc_per_use_case: null
+          mult_complexity: Very High
+          mult_reliability: Very High
+          mult_team_capability: Nominal
+          mult_platform_volatility: Nominal
+          mult_process_maturity: Level 3
+          extra_effort_factor: 1
+      - id: f74c120105
+        type: component
+        name: Payload interface
+        attributes:
+          description: ""
+          owner: ""
+          language: C
+          maturity: Concept / Proposal
+          size_basis: sloc
+          existing_sloc: 10000
+          existing_requirements: 0
+          existing_use_cases: 0
+          pct_design_modified: {low: 10, likely: 30, high: 50}
+          pct_code_modified: {low: 20, likely: 40, high: 60}
+          pct_integration: {low: 50, likely: 80, high: 100}
+          pct_requirements_modified: {low: 0, likely: 0, high: 0}
+          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          new_sloc: {low: 4000, likely: 7000, high: 14000}
+          new_requirements: {low: 0, likely: 0, high: 0}
+          new_use_cases: {low: 0, likely: 0, high: 0}
+          sloc_per_requirement: null
+          sloc_per_use_case: null
+          mult_complexity: Nominal
+          mult_reliability: Nominal
+          mult_team_capability: Nominal
+          mult_platform_volatility: Nominal
+          mult_process_maturity: Level 3
+          extra_effort_factor: 1
+      - id: dd9ce92c82
+        type: component
+        name: FPGA firmware
+        attributes:
+          description: ""
+          owner: ""
+          language: VHDL / Verilog
+          maturity: Concept / Proposal
+          size_basis: sloc
+          existing_sloc: 0
+          existing_requirements: 0
+          existing_use_cases: 0
+          pct_design_modified: {low: 0, likely: 0, high: 0}
+          pct_code_modified: {low: 0, likely: 0, high: 0}
+          pct_integration: {low: 0, likely: 0, high: 0}
+          pct_requirements_modified: {low: 0, likely: 0, high: 0}
+          pct_use_cases_modified: {low: 0, likely: 0, high: 0}
+          new_sloc: {low: 3000, likely: 5000, high: 9000}
+          new_requirements: {low: 0, likely: 0, high: 0}
+          new_use_cases: {low: 0, likely: 0, high: 0}
+          sloc_per_requirement: null
+          sloc_per_use_case: null
+          mult_complexity: Nominal
+          mult_reliability: Nominal
+          mult_team_capability: Nominal
+          mult_platform_volatility: High
+          mult_process_maturity: Level 3
+          extra_effort_factor: 1

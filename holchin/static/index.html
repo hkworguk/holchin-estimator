@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holchin Estimator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232a78d6'/%3E%3Cpath d='M6 24 L13 12 L19 19 L26 8' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--series-1)"/><path d="M6 24 L13 12 L19 19 L26 8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Holchin Estimator</span>
+  </div>
+  <input id="projectName" class="project-name" aria-label="Project name" spellcheck="false">
+  <div class="toolbar">
+    <button data-act="new" title="New project">New</button>
+    <button data-act="import" title="Open a YAML file from your computer">Open…</button>
+    <button data-act="save" class="primary" title="Save to project file (Ctrl+S)">Save</button>
+    <button data-act="saveas" title="Save to a file path on the server machine">Save as…</button>
+    <button data-act="download" title="Download project as YAML">Download</button>
+    <span class="sep"></span>
+    <button data-act="undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+    <button data-act="redo" title="Redo (Ctrl+Shift+Z)" aria-label="Redo">↷</button>
+    <span class="sep"></span>
+    <button data-act="settings" title="Model calibration and settings">Settings</button>
+    <button data-act="theme" title="Toggle light/dark" aria-label="Toggle theme">◐</button>
+  </div>
+  <div id="status" class="status"></div>
+  <input type="file" id="fileInput" accept=".yaml,.yml,text/yaml" hidden>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="tree-tools">
+      <button data-act="add-group" title="Add group inside the selected group">＋ Group</button>
+      <button data-act="add-component" title="Add component inside the selected group">＋ Component</button>
+      <button data-act="expand-all" title="Expand all" aria-label="Expand all">⊞</button>
+      <button data-act="collapse-all" title="Collapse all" aria-label="Collapse all">⊟</button>
+    </div>
+    <input id="treeFilter" class="tree-filter" placeholder="Filter…" aria-label="Filter tree">
+    <div id="tree" class="tree" role="tree" tabindex="0"></div>
+    <div class="tree-hint">Drag to move · Ctrl/⌘-click to multi-select · Right-click for more · F2 rename</div>
+  </aside>
+  <div class="resizer" id="resizer" aria-hidden="true"></div>
+  <main id="main" class="main"></main>
+</div>
+
+<div id="tooltip" class="tooltip" role="tooltip"></div>
+<div id="menu" class="menu" role="menu"></div>
+<div id="modal" class="modal-backdrop" hidden><div class="modal" role="dialog" aria-modal="true"></div></div>
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
